@@ -1,0 +1,39 @@
+{
+  "name": "bicycle/tesseract-bridge",
+  "license": "MIT",
+  "description": "Integration of tesseract bridge via FFI and CLI",
+  "type": "library",
+  "keywords": ["tesseract", "ocr", "integration", "library", "ffi", "cli"],
+  "authors": [
+    {
+      "name": "Vladimir Khramtsov",
+      "homepage": "https://github.com/vkhramtsov",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/vkhramtsov/tesseract-bridge/issues"
+  },
+  "require": {
+    "php": ">7.4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Bicycle\\": "src/Bicycle"
+    }
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^2.17.3",
+    "phpunit/phpunit": "^9.5.0",
+    "squizlabs/php_codesniffer": "^3.5.8"
+  },
+  "suggest": {
+    "ext-ffi": "So you can use tesseract via ffi integration"
+  },
+  "config": {
+    "preferred-install": {
+      "*": "dist"
+    },
+    "sort-packages": true
+  }
+}

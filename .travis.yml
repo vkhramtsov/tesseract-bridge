@@ -1,0 +1,32 @@
+language: php
+
+php:
+  - 7.4
+  - 8.0
+
+# Note that PHP_CS_FIXER_IGNORE_ENV=1 is defined because php-cs-fixer complains about php higher than 8.0.
+# Remove it after closing https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/4702
+env:
+  - PREFER_LOWEST=1 PHP_CS_FIXER_IGNORE_ENV=1
+  - PREFER_LOWEST=0 PHP_CS_FIXER_IGNORE_ENV=1
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+os:
+  - linux
+
+addons:
+  apt:
+    packages:
+      - tesseract-ocr
+
+before_script:
+  - composer install
+  - if [[ $PREFER_LOWEST == 1 ]]; then composer update --prefer-lowest; fi
+  - php vendor/bin/php-cs-fixer fix --dry-run --diff
+  - php vendor/bin/phpcs --standard=PSR1,PSR2,PSR12 src tests
+
+script:
+  - php vendor/bin/phpunit
