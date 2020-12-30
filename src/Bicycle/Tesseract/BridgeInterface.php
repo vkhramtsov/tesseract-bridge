@@ -15,4 +15,9 @@ interface BridgeInterface
      * @return string
      */
     public function getVersion(): string;
+
+    /**
+     * @return array
+     */
+    public function getAvailableLanguages(): array;
 }
