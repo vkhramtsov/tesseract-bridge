@@ -9,7 +9,7 @@ class Configuration
     /** @var string[] */
     private const ALLOWED_OPTIONS = ['library_path', 'binary_path', 'capi_header_path'];
 
-    /** @var array */
+    /** @var array|string[] */
     private array $options;
 
     /**
@@ -62,12 +62,17 @@ class Configuration
     {
         $problematicOptions = [];
         foreach (array_keys($options) as $option) {
-            if (!in_array($option, static::ALLOWED_OPTIONS, true) || !\is_string($options[$option])) {
+            if (!\is_string($options[$option]) || !in_array($option, static::ALLOWED_OPTIONS, true)) {
                 $problematicOptions[] = $option;
             }
         }
+        $message = sprintf(
+            'Problem with options %s, allowed options %s',
+            implode(', ', $problematicOptions),
+            implode(', ', static::ALLOWED_OPTIONS)
+        );
         if (count($problematicOptions)) {
-            throw new ConfigurationException(sprintf('Problem with options %s', implode(', ', $problematicOptions)));
+            throw new ConfigurationException($message);
         }
     }
 }

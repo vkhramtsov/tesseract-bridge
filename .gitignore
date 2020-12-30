@@ -7,3 +7,7 @@
 /composer.lock
 /vendor/
 ###< Composer related ###
+
+###> Utility files ###
+/tests/tmp/
+###< Utility files ###

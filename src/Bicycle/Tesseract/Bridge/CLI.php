@@ -17,6 +17,10 @@ class CLI implements BridgeInterface
     {
         // Prevent configuration change in runtime
         $this->configuration = clone $configuration;
+        $cliBinary = $this->configuration->getCliBinaryPath();
+        if (empty($cliBinary)) {
+            throw new Exception\Exception('Cannot use CLI without proper cli path');
+        }
     }
 
     /**
@@ -29,22 +33,37 @@ class CLI implements BridgeInterface
             return '';
         }
         $matches = [];
-        preg_match('/[\d\.]+.*/', $output[0], $matches);
+        preg_match('/[\d\.]+.*$/', $output[0], $matches);
 
         return $matches[0] ?? '';
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getAvailableLanguages(): array
+    {
+        $output = $this->executeCommand(['--list-langs'])->getOutputArray();
+        if (empty($output)) {
+            return [];
+        }
+
+        return array_slice($output, 1);
+    }
+
+    /**
      * @param array $arguments
      *
-     * @return string
+     * @return Result
      */
     private function executeCommand(array $arguments): Result
     {
         $output = null;
         $resultCode = null;
+        /** @var string $cliPath see constructor */
+        $cliPath = $this->configuration->getCliBinaryPath();
         exec(
-            sprintf('%s %s', $this->configuration->getCliBinaryPath(), implode(' ', $arguments)),
+            sprintf('%s %s 2>&1', $cliPath, implode(' ', $arguments)),
             $output,
             $resultCode
         );

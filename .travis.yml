@@ -23,10 +23,17 @@ addons:
       - tesseract-ocr
 
 before_script:
+  - composer validate
   - composer install
   - if [[ $PREFER_LOWEST == 1 ]]; then composer update --prefer-lowest; fi
-  - php vendor/bin/php-cs-fixer fix --dry-run --diff
-  - php vendor/bin/phpcs --standard=PSR1,PSR2,PSR12 src tests
+  - cd src && ! find . -type f -name "*.php" -exec php -d error_reporting=32767 -l {} \; 2>&1 >&- | grep "^" && cd ../tests && ! find . -type f -name "*.php" -exec php -d error_reporting=32767 -l {} \; 2>&1 >&- | grep "^" && cd ..
 
 script:
+  - sh tests/prepareData.sh
+  - php vendor/bin/php-cs-fixer fix --dry-run --diff
+  - php vendor/bin/phpcs --standard=PSR12 src tests
+  - php vendor/bin/phpmd src text Resources/configs/phpmd/phpmd.xml
+  - php vendor/bin/phpmd tests text Resources/configs/phpmd/phpmd.xml
+  - php vendor/bin/psalm --show-info=true
   - php vendor/bin/phpunit
+  - composer outdated -D
