@@ -4,12 +4,20 @@ namespace Bicycle\Tesseract\Bridge;
 
 use Bicycle\Tesseract\Bridge\Exception\Exception;
 use Bicycle\Tesseract\Bridge\Exception\ExtensionRequiredException;
+use Bicycle\Tesseract\Bridge\Exception\InputProblemException;
+use Bicycle\Tesseract\Bridge\Exception\UnavailableLanguageException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FFITest extends TestCase
 {
     /** @var FFI */
     private FFI $testInstance;
+
+    /** @var string */
+    private string $testImagePath;
 
     /**
      * {@inheritDoc}
@@ -17,6 +25,13 @@ class FFITest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->testImagePath = realpath(
+            sprintf(
+                '%1$s%2$s..%2$s..%2$s..%2$sdata%2$simage%2$seurotext.png',
+                __DIR__,
+                DIRECTORY_SEPARATOR
+            )
+        );
         // Create configuration with default c header file
         $configuration = new Configuration(['library_path' => 'libtesseract.so.4']);
         if ($this->isFFIEnabled(false)) {
@@ -64,6 +79,84 @@ class FFITest extends TestCase
             FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES
         );
         self::assertEquals($languagesInfo, $this->testInstance->getAvailableLanguages());
+    }
+
+    public function testRecognizeFromFileNonExistentFile(): void
+    {
+        $this->isFFIEnabled();
+        $filename = 'text.png';
+        $this->expectException(InputProblemException::class);
+        $this->expectExceptionMessage('Cannot read input file');
+        $this->testInstance->recognizeFromFile($filename);
+    }
+
+    public function testRecognizeFromFileNonExistentLang(): void
+    {
+        $this->isFFIEnabled();
+        $this->expectException(UnavailableLanguageException::class);
+        $this->expectExceptionMessage('Unknown language(s) en for recognition.');
+        $this->testInstance->recognizeFromFile($this->testImagePath, ['en']);
+    }
+
+    public function testRecognizeFromFileWithoutLang(): void
+    {
+        $this->isFFIEnabled();
+        self::assertEquals(
+            // Tesseract adds \f to end of output files, but not for C API
+            rtrim(file_get_contents($this->getTestInfo('eurotext-eng.txt')), "\f"),
+            $this->testInstance->recognizeFromFile($this->testImagePath, [])
+        );
+    }
+
+    public function testRecognizeFromFileWithOneLang(): void
+    {
+        $this->isFFIEnabled();
+        self::assertEquals(
+            // Tesseract adds \f to end of output files, but not for C API
+            rtrim(file_get_contents($this->getTestInfo('eurotext-eng.txt')), "\f"),
+            $this->testInstance->recognizeFromFile($this->testImagePath, ['eng'])
+        );
+    }
+
+    public function testRecognizeFromFileWithDiffLang(): void
+    {
+        $this->isFFIEnabled();
+        self::assertNotEquals(
+            // Tesseract adds \f to end of output files, but not for C API
+            rtrim(file_get_contents($this->getTestInfo('eurotext-eng.txt')), "\f"),
+            $this->testInstance->recognizeFromFile($this->testImagePath, ['spa'])
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    public function languagesDataProvider(): array
+    {
+        return [
+            ['eurotext-deueng.txt', ['deu', 'eng']],
+            ['eurotext-deuspa.txt', ['deu', 'spa']],
+            ['eurotext-deuspaeng.txt', ['deu', 'spa', 'eng']],
+            ['eurotext-engdeu.txt', ['eng', 'deu']],
+            ['eurotext-engdeuspa.txt', ['eng', 'deu', 'spa']],
+            ['eurotext-spadeu.txt', ['spa', 'deu']],
+        ];
+    }
+
+    /**
+     * @dataProvider languagesDataProvider
+     *
+     * @param string $testData
+     * @param array  $languages
+     */
+    public function testRecognizeFromFileWithLangs(string $testData, array $languages): void
+    {
+        $this->isFFIEnabled();
+        self::assertEquals(
+            // Tesseract adds \f to end of output files, but not for C API
+            rtrim(file_get_contents($this->getTestInfo($testData)), "\f"),
+            $this->testInstance->recognizeFromFile($this->testImagePath, $languages)
+        );
     }
 
     /**

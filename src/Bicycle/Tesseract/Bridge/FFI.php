@@ -4,13 +4,20 @@ namespace Bicycle\Tesseract\Bridge;
 
 use Bicycle\Tesseract\BridgeInterface;
 
+/**
+ * Please note that here we have \FFI class instance instead of FFI\TesseractInterface.
+ */
 class FFI implements BridgeInterface
 {
     /** @var Configuration */
     private Configuration $configuration;
 
-    /** @var \FFI */
-    private \FFI $ffiInstance;
+    /**
+     * I have to use interface here, but actually we have here \FFI class instance. Do not set type for this property!
+     *
+     * @var FFI\TesseractInterface
+     */
+    private $ffiInstance;
 
     /**
      * {@inheritDoc}
@@ -34,7 +41,7 @@ class FFI implements BridgeInterface
             if (empty($libaryPath)) {
                 throw new Exception\Exception('Problem with connecting library via FFI');
             }
-            /** @var \FFI ffiInstance */
+            /** @var FFI\TesseractInterface ffiInstance */
             $this->ffiInstance = \FFI::cdef(
                 $definitions,
                 $libaryPath
@@ -46,15 +53,9 @@ class FFI implements BridgeInterface
 
     /**
      * {@inheritDoc}
-     *
-     * @psalm-suppress MixedInferredReturnType
      */
     public function getVersion(): string
     {
-        /**
-         * @psalm-suppress UndefinedMethod
-         * @psalm-suppress MixedReturnStatement
-         */
         return $this->ffiInstance->TessVersion();
     }
 
@@ -65,24 +66,14 @@ class FFI implements BridgeInterface
     {
         $result = [];
         /**
-         * @psalm-suppress UndefinedMethod
          * @psalm-suppress MixedAssignment
          */
         $baseApiHandle = $this->ffiInstance->TessBaseAPICreate();
-        /**
-         * @psalm-suppress UndefinedMethod
-         *
-         * @var bool $initFailed
-         */
         $initFailed = $this->ffiInstance->TessBaseAPIInit3($baseApiHandle, null, null); // Tesseract initialization
         if ($initFailed) {
+            $this->ffiInstance->TessBaseAPIDelete($baseApiHandle);
             throw new Exception\Exception('Cannot initialize tesseract');
         }
-        /**
-         * @psalm-suppress UndefinedMethod
-         *
-         * @var array $languages
-         */
         $languages = $this->ffiInstance->TessBaseAPIGetAvailableLanguagesAsVector($baseApiHandle);
         $counter = 0;
         // According to body of TessBaseAPIGetAvailableLanguagesAsVector method, last element will be nullptr
@@ -90,11 +81,57 @@ class FFI implements BridgeInterface
             /** @psalm-suppress MixedAssignment */
             $result[] = \FFI::string($languages[$counter++]);
         }
-        /** @psalm-suppress UndefinedMethod */
         $this->ffiInstance->TessBaseAPIEnd($baseApiHandle);
-        /** @psalm-suppress UndefinedMethod */
         $this->ffiInstance->TessBaseAPIDelete($baseApiHandle);
 
         return $result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function recognizeFromFile(string $filename, array $languages = []): string
+    {
+        if (!\is_readable($filename)) {
+            throw new Exception\InputProblemException('Cannot read input file');
+        }
+        if (empty($languages)) {
+            $languages[] = 'eng';
+        } elseif (
+            count($intersection = array_intersect($languages, $this->getAvailableLanguages())) !== count($languages)
+        ) {
+            $exceptionMessage = sprintf(
+                'Unknown language(s) %s for recognition.',
+                implode(', ', array_diff($languages, $intersection))
+            );
+            throw new Exception\UnavailableLanguageException($exceptionMessage);
+        }
+
+        $resultText = '';
+
+        /**
+         * @psalm-suppress MixedAssignment
+         */
+        $baseApiHandle = $this->ffiInstance->TessBaseAPICreate();
+        $initFailed = $this->ffiInstance->TessBaseAPIInit3(
+            $baseApiHandle,
+            null,
+            implode('+', $languages)
+        ); // Tesseract initialization
+        if ($initFailed) {
+            $this->ffiInstance->TessBaseAPIDelete($baseApiHandle);
+            throw new Exception\Exception('Cannot initialize tesseract');
+        }
+
+        if ($this->ffiInstance->TessBaseAPIProcessPages($baseApiHandle, $filename, null, 0, null)) {
+            $resultText = $this->ffiInstance->TessBaseAPIGetUTF8Text($baseApiHandle);
+            /** @var string $resultText */
+            $resultText = \FFI::string($resultText);
+        }
+
+        $this->ffiInstance->TessBaseAPIEnd($baseApiHandle);
+        $this->ffiInstance->TessBaseAPIDelete($baseApiHandle);
+
+        return $resultText;
     }
 }

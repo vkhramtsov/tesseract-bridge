@@ -3,6 +3,8 @@
 namespace Bicycle\Tesseract\Bridge;
 
 use Bicycle\Tesseract\Bridge\Exception\Exception;
+use Bicycle\Tesseract\Bridge\Exception\InputProblemException;
+use Bicycle\Tesseract\Bridge\Exception\UnavailableLanguageException;
 use PHPUnit\Framework\TestCase;
 
 class CLITest extends TestCase
@@ -10,14 +12,23 @@ class CLITest extends TestCase
     /** @var CLI */
     private CLI $testInstance;
 
+    /** @var string */
+    private string $testImagePath;
+
     /**
      * {@inheritDoc}
      */
     protected function setUp(): void
     {
         parent::setUp();
-        $cliPath = $this->findExecutable();
-        $configuration = new Configuration(['binary_path' => $cliPath]);
+        $this->testImagePath = realpath(
+            sprintf(
+                '%1$s%2$s..%2$s..%2$s..%2$sdata%2$simage%2$seurotext.png',
+                __DIR__,
+                DIRECTORY_SEPARATOR
+            )
+        );
+        $configuration = new Configuration(['binary_path' => 'tesseract']);
         $this->testInstance = new CLI($configuration);
     }
 
@@ -44,6 +55,74 @@ class CLITest extends TestCase
         self::assertEquals($languagesInfo, $this->testInstance->getAvailableLanguages());
     }
 
+    public function testRecognizeFromFileNonExistentFile(): void
+    {
+        $filename = 'text.png';
+        $this->expectException(InputProblemException::class);
+        $this->expectExceptionMessage('Cannot read input file');
+        $this->testInstance->recognizeFromFile($filename);
+    }
+
+    public function testRecognizeFromFileNonExistentLang(): void
+    {
+        $this->expectException(UnavailableLanguageException::class);
+        $this->expectExceptionMessage('Unknown language(s) en for recognition.');
+        $this->testInstance->recognizeFromFile($this->testImagePath, ['en']);
+    }
+
+    public function testRecognizeFromFileWithoutLang(): void
+    {
+        self::assertStringEqualsFile(
+            $this->getTestInfo('eurotext-eng.txt'),
+            $this->testInstance->recognizeFromFile($this->testImagePath, [])
+        );
+    }
+
+    public function testRecognizeFromFileWithOneLang(): void
+    {
+        self::assertStringEqualsFile(
+            $this->getTestInfo('eurotext-eng.txt'),
+            $this->testInstance->recognizeFromFile($this->testImagePath, ['eng'])
+        );
+    }
+
+    public function testRecognizeFromFileWithDiffLang(): void
+    {
+        self::assertStringNotEqualsFile(
+            $this->getTestInfo('eurotext-eng.txt'),
+            $this->testInstance->recognizeFromFile($this->testImagePath, ['spa'])
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    public function languagesDataProvider(): array
+    {
+        return [
+            ['eurotext-deueng.txt', ['deu', 'eng']],
+            ['eurotext-deuspa.txt', ['deu', 'spa']],
+            ['eurotext-deuspaeng.txt', ['deu', 'spa', 'eng']],
+            ['eurotext-engdeu.txt', ['eng', 'deu']],
+            ['eurotext-engdeuspa.txt', ['eng', 'deu', 'spa']],
+            ['eurotext-spadeu.txt', ['spa', 'deu']],
+        ];
+    }
+
+    /**
+     * @dataProvider languagesDataProvider
+     *
+     * @param string $testData
+     * @param array  $languages
+     */
+    public function testRecognizeFromFileWithLangs(string $testData, array $languages): void
+    {
+        self::assertStringEqualsFile(
+            $this->getTestInfo($testData),
+            $this->testInstance->recognizeFromFile($this->testImagePath, $languages)
+        );
+    }
+
     /**
      * @param string $filename
      *
@@ -57,26 +136,5 @@ class CLITest extends TestCase
         }
 
         return $path;
-    }
-
-    /**
-     * @return string
-     */
-    private function findExecutable(): string
-    {
-        $cliPath = '';
-        switch (PHP_OS) {
-            case 'Linux':
-                $cliPath = '/usr/bin/tesseract';
-                break;
-            case 'FreeBSD':
-                $cliPath = '/usr/local/bin/tesseract';
-                break;
-        }
-
-        if (!empty($cliPath) && \is_executable($cliPath)) {
-            return $cliPath;
-        }
-        $this->fail('No tesseract cli found');
     }
 }
