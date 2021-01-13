@@ -21,6 +21,9 @@ addons:
   apt:
     packages:
       - tesseract-ocr
+      - tesseract-ocr-eng
+      - tesseract-ocr-deu
+      - tesseract-ocr-spa
 
 branches:
   only:

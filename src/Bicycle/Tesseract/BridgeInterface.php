@@ -20,4 +20,12 @@ interface BridgeInterface
      * @return array
      */
     public function getAvailableLanguages(): array;
+
+    /**
+     * @param string $filename
+     * @param array  $languages
+     *
+     * @return string
+     */
+    public function recognizeFromFile(string $filename, array $languages = []): string;
 }

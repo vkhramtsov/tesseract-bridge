@@ -52,6 +52,58 @@ class CLI implements BridgeInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function recognizeFromFile(string $filename, array $languages = []): string
+    {
+        if (!\is_readable($filename)) {
+            throw new Exception\InputProblemException('Cannot read input file');
+        }
+        $languagesArg = '';
+        if (!empty($languages)) {
+            if (
+                count($intersection = array_intersect(
+                    $languages,
+                    $this->getAvailableLanguages()
+                )) !== count($languages)
+            ) {
+                $exceptionMessage = sprintf(
+                    'Unknown language(s) %s for recognition.',
+                    implode(', ', array_diff($languages, $intersection))
+                );
+                throw new Exception\UnavailableLanguageException($exceptionMessage);
+            }
+            $languagesArg = sprintf('-l %s', escapeshellarg(implode('+', $languages)));
+        }
+
+        $tmpOutFile = sprintf(
+            '%s%sphp_tesseract_ocr_%s',
+            sys_get_temp_dir(),
+            DIRECTORY_SEPARATOR,
+            /**
+             * It looks like 5 will be enough (640 Kb...).
+             * Also we need to remove directory separator from generated string.
+             */
+            str_replace([DIRECTORY_SEPARATOR], '_', base64_encode(random_bytes(5)))
+        );
+        $realTmpOutFile = $tmpOutFile . '.txt';
+        $this->executeCommand(
+            [
+                escapeshellarg($filename),
+                escapeshellarg($tmpOutFile),
+                $languagesArg,
+            ]
+        );
+
+        // Adding .txt because tesseract automatically add .txt to output files
+        $recognizedText = file_get_contents($realTmpOutFile);
+
+        unlink($realTmpOutFile);
+
+        return $recognizedText;
+    }
+
+    /**
      * @param array $arguments
      *
      * @return Result
