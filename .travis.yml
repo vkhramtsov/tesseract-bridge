@@ -22,6 +22,10 @@ addons:
     packages:
       - tesseract-ocr
 
+branches:
+  only:
+    - master
+
 before_script:
   - composer validate
   - composer install
@@ -35,5 +39,7 @@ script:
   - php vendor/bin/phpmd src text Resources/configs/phpmd/phpmd.xml
   - php vendor/bin/phpmd tests text Resources/configs/phpmd/phpmd.xml
   - php vendor/bin/psalm --show-info=true
+  - php vendor/bin/phpcpd src
+  - php vendor/bin/phpcpd tests
   - php vendor/bin/phpunit
   - composer outdated -D
