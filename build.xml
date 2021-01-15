@@ -88,7 +88,7 @@
     <target name="phpunit" description="Run tests">
         <!-- Using exec here because phing cannot find phpunit -->
         <exec executable="${php-bin}" dir="." checkReturn="false" outputProperty="phpunit-results" returnProperty="phpunit-return" >
-            <arg value="-d=xdebug.mode=coverage" />
+<!--            <arg value="-d=xdebug.mode=coverage" />--> <!-- We need this only with xdebug version 3 and above -->
             <arg value="${project-vendor-bin-dir}/phpunit" />
         </exec>
         <echo message="${phpunit-results}" />
