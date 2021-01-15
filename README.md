@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2e87afedaea348908638368b7a020c32)](https://app.codacy.com/gh/vkhramtsov/tesseract-bridge?utm_source=github.com&utm_medium=referral&utm_content=vkhramtsov/tesseract-bridge&utm_campaign=Badge_Grade_Settings)
 A wrapper to work with Tesseract OCR inside PHP via CLI and/or FFI interfaces. [![Build Status](https://travis-ci.org/vkhramtsov/tesseract-bridge.svg?branch=master)](https://travis-ci.org/vkhramtsov/tesseract-bridge)
 
 :bangbang: **Tested only on FreeBSD and Debian and Ubuntu platforms with [Tesseract OCR][] version 3 and 4 (see build logs).**
