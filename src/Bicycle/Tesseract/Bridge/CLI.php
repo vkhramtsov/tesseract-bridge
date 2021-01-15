@@ -96,7 +96,7 @@ class CLI implements BridgeInterface
         );
 
         // Adding .txt because tesseract automatically add .txt to output files
-        $recognizedText = file_get_contents($realTmpOutFile);
+        $recognizedText = rtrim(file_get_contents($realTmpOutFile), "\f");
 
         unlink($realTmpOutFile);
 
