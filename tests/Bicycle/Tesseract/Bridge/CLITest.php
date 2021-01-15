@@ -72,24 +72,27 @@ class CLITest extends TestCase
 
     public function testRecognizeFromFileWithoutLang(): void
     {
-        self::assertStringEqualsFile(
-            $this->getTestInfo('eurotext-eng.txt'),
+        self::assertEquals(
+            // Just because tesseract adds \f to the end of files
+            rtrim(file_get_contents($this->getTestInfo('eurotext-eng.txt')), "\f"),
             $this->testInstance->recognizeFromFile($this->testImagePath, [])
         );
     }
 
     public function testRecognizeFromFileWithOneLang(): void
     {
-        self::assertStringEqualsFile(
-            $this->getTestInfo('eurotext-eng.txt'),
+        self::assertEquals(
+            // Just because tesseract adds \f to the end of files
+            rtrim(file_get_contents($this->getTestInfo('eurotext-eng.txt')), "\f"),
             $this->testInstance->recognizeFromFile($this->testImagePath, ['eng'])
         );
     }
 
     public function testRecognizeFromFileWithDiffLang(): void
     {
-        self::assertStringNotEqualsFile(
-            $this->getTestInfo('eurotext-eng.txt'),
+        self::assertNotEquals(
+            // Just because tesseract adds \f to the end of files
+            rtrim(file_get_contents($this->getTestInfo('eurotext-eng.txt')), "\f"),
             $this->testInstance->recognizeFromFile($this->testImagePath, ['spa'])
         );
     }
@@ -117,8 +120,9 @@ class CLITest extends TestCase
      */
     public function testRecognizeFromFileWithLangs(string $testData, array $languages): void
     {
-        self::assertStringEqualsFile(
-            $this->getTestInfo($testData),
+        self::assertEquals(
+            // Just because tesseract adds \f to the end of files
+            rtrim(file_get_contents($this->getTestInfo($testData)), "\f"),
             $this->testInstance->recognizeFromFile($this->testImagePath, $languages)
         );
     }
