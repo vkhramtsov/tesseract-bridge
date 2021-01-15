@@ -86,6 +86,8 @@ class CLI implements BridgeInterface
              */
             str_replace([DIRECTORY_SEPARATOR], '_', base64_encode(random_bytes(5)))
         );
+
+        // Adding .txt because tesseract automatically add .txt to output files
         $realTmpOutFile = $tmpOutFile . '.txt';
         $this->executeCommand(
             [
@@ -95,7 +97,6 @@ class CLI implements BridgeInterface
             ]
         );
 
-        // Adding .txt because tesseract automatically add .txt to output files
         $recognizedText = rtrim(file_get_contents($realTmpOutFile), "\f");
 
         unlink($realTmpOutFile);

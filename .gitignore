@@ -10,4 +10,5 @@
 
 ###> Utility files ###
 /tests/tmp/
+/clover.xml
 ###< Utility files ###
