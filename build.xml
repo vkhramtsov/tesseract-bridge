@@ -87,7 +87,10 @@
 
     <target name="phpunit" description="Run tests">
         <!-- Using exec here because phing cannot find phpunit -->
-        <exec executable="${project-vendor-bin-dir}/phpunit" dir="." checkReturn="false" outputProperty="phpunit-results" returnProperty="phpunit-return" />
+        <exec executable="${php-bin}" dir="." checkReturn="false" outputProperty="phpunit-results" returnProperty="phpunit-return" >
+            <arg value="-d=xdebug.mode=coverage" />
+            <arg value="${project-vendor-bin-dir}/phpunit" />
+        </exec>
         <echo message="${phpunit-results}" />
         <if>
             <istrue value="${phpunit-return}" />

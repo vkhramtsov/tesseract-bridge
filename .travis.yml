@@ -44,5 +44,8 @@ script:
   - php vendor/bin/psalm --show-info=true
   - php vendor/bin/phpcpd src
   - php vendor/bin/phpcpd tests
-  - php vendor/bin/phpunit
+  - php -d=xdebug.mode=coverage vendor/bin/phpunit
   - composer outdated -D
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
