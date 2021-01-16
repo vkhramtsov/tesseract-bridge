@@ -9,7 +9,7 @@ A wrapper to work with Tesseract OCR inside PHP via CLI and/or FFI interfaces.
 [![Monthly downloads](https://img.shields.io/packagist/dm/bicycle/tesseract-bridge.svg)](https://packagist.org/packages/bicycle/tesseract-bridge)
 [![License](https://img.shields.io/packagist/l/bicycle/tesseract-bridge.svg)](https://packagist.org/packages/bicycle/tesseract-bridge)
 
-:bangbang: **Tested only on FreeBSD and Debian and Ubuntu platforms with [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) version 3 and 4 (see build logs).**
+:bangbang: **Tested only on FreeBSD, Debian and Ubuntu platforms with [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) version 3 and 4 (see build logs).**
 
 ## Installation
 
@@ -24,50 +24,50 @@ Via [Composer](https://getcomposer.org/):
   ![example](tests/data/image/eurotext.png)
 
 -   CLI
-    ```php
-    use Bicycle\Tesseract\Bridge as TesseractBridge;
-    
-    $configuration = TesseractBridge\Configuration(['binary_path' => 'tesseract']);
-    $bridge = new TesseractBridge\CLI($configuration);
-    echo $bridge->testGetVersion();
-    print_r($bridge->getAvailableLanguages());
-    echo $bridge->recognizeFromFile('eurotext.png'); // Set proper path here
-    ```
+        ```php
+        use Bicycle\Tesseract\Bridge as TesseractBridge;
+        
+        $configuration = TesseractBridge\Configuration(['binary_path' => 'tesseract']);
+        $bridge = new TesseractBridge\CLI($configuration);
+        echo $bridge->testGetVersion();
+        print_r($bridge->getAvailableLanguages());
+        echo $bridge->recognizeFromFile('eurotext.png'); // Set proper path here
+        ```
 
 -   FFI
-    ```php
-    use Bicycle\Tesseract\Bridge as TesseractBridge;
-    
-    $configuration = TesseractBridge\Configuration(['binary_path' => 'tesseract']);
-    $bridge = new TesseractBridge\FFI($configuration);
-    echo $bridge->testGetVersion();
-    print_r($bridge->getAvailableLanguages());
-    echo $bridge->recognizeFromFile('eurotext.png'); // Set proper path here
-    ```
+        ```php
+        use Bicycle\Tesseract\Bridge as TesseractBridge;
+        
+        $configuration = TesseractBridge\Configuration(['binary_path' => 'tesseract']);
+        $bridge = new TesseractBridge\FFI($configuration);
+        echo $bridge->testGetVersion();
+        print_r($bridge->getAvailableLanguages());
+        echo $bridge->recognizeFromFile('eurotext.png'); // Set proper path here
+        ```
 
 ### With languages
 
 -   CLI
-    ```php
-    use Bicycle\Tesseract\Bridge as TesseractBridge;
-    
-    $configuration = TesseractBridge\Configuration(['binary_path' => 'tesseract']);
-    $bridge = new TesseractBridge\CLI($configuration);
-    echo $bridge->testGetVersion();
-    print_r($bridge->getAvailableLanguages());
-    echo $bridge->recognizeFromFile('eurotext.png', ['deu']); // Set proper path here
-    ```
+        ```php
+        use Bicycle\Tesseract\Bridge as TesseractBridge;
+        
+        $configuration = TesseractBridge\Configuration(['binary_path' => 'tesseract']);
+        $bridge = new TesseractBridge\CLI($configuration);
+        echo $bridge->testGetVersion();
+        print_r($bridge->getAvailableLanguages());
+        echo $bridge->recognizeFromFile('eurotext.png', ['deu']); // Set proper path here
+        ```
 
 -   FFI
-    ```php
-    use Bicycle\Tesseract\Bridge as TesseractBridge;
-  
-    $configuration = TesseractBridge\Configuration(['binary_path' => 'tesseract']);
-    $bridge = new TesseractBridge\FFI($configuration);
-    echo $bridge->testGetVersion();
-    print_r($bridge->getAvailableLanguages());
-    echo $bridge->recognizeFromFile('eurotext.png', ['deu']); // Set proper path here
-    ```
+        ```php
+        use Bicycle\Tesseract\Bridge as TesseractBridge;
+      
+        $configuration = TesseractBridge\Configuration(['binary_path' => 'tesseract']);
+        $bridge = new TesseractBridge\FFI($configuration);
+        echo $bridge->testGetVersion();
+        print_r($bridge->getAvailableLanguages());
+        echo $bridge->recognizeFromFile('eurotext.png', ['deu']); // Set proper path here
+        ```
 
 ## How to contribute
 
