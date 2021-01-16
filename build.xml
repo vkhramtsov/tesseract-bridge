@@ -64,11 +64,9 @@
     <target name="phpcpd" description="Find code duplicates">
         <exec executable="${php-bin}" logoutput="true" checkreturn="true">
             <arg path="${project-vendor-bin-dir}/phpcpd" />
-            <arg value="${project-src-dir}/" />
-        </exec>
-        <exec executable="${php-bin}" logoutput="true" checkreturn="true">
-            <arg path="${project-vendor-bin-dir}/phpcpd" />
-            <arg value="${project-tests-dir}/" />
+            <arg value="--exclude" />
+            <arg value="${project-vendor-dir}" />
+            <arg value="." />
         </exec>
     </target>
 

@@ -39,11 +39,9 @@ script:
   - sh tests/prepareData.sh
   - php vendor/bin/php-cs-fixer fix --dry-run --diff
   - php vendor/bin/phpcs --standard=PSR12 src tests
-  - php vendor/bin/phpmd src text Resources/configs/phpmd/phpmd.xml
-  - php vendor/bin/phpmd tests text Resources/configs/phpmd/phpmd.xml
+  - php vendor/bin/phpmd . text Resources/configs/phpmd/phpmd.xml --exclude vendor
   - php vendor/bin/psalm --show-info=true
-  - php vendor/bin/phpcpd src
-  - php vendor/bin/phpcpd tests
+  - php vendor/bin/phpcpd --exclude vendor .
   - php -d=xdebug.mode=coverage vendor/bin/phpunit
   - composer outdated -D
 
