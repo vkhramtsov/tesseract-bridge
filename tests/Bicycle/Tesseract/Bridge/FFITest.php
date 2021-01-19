@@ -59,7 +59,7 @@ class FFITest extends TestCase
     {
         $this->isFFIEnabled();
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Problem with connecting library via FFI');
+        $this->expectExceptionMessage('Problem with connecting library via FFI: empty library path');
         $configuration = new Configuration([]);
         new FFI($configuration);
     }

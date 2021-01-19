@@ -39,7 +39,7 @@ class FFI implements BridgeInterface
         try {
             $libaryPath = $this->configuration->getSharedLibraryPath();
             if (empty($libaryPath)) {
-                throw new Exception\Exception('Problem with connecting library via FFI');
+                throw new Exception\Exception('Problem with connecting library via FFI: empty library path');
             }
             /** @var FFI\TesseractInterface ffiInstance */
             $this->ffiInstance = \FFI::cdef(
@@ -47,7 +47,7 @@ class FFI implements BridgeInterface
                 $libaryPath
             );
         } catch (\FFI\Exception $e) {
-            throw new Exception\Exception('Problem with connecting library via FFI');
+            throw new Exception\Exception(sprintf('Problem with connecting library via FFI: %s', $e->getMessage()));
         }
     }
 
