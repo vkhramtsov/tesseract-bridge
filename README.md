@@ -1,5 +1,6 @@
 A wrapper to work with Tesseract OCR inside PHP via CLI and/or FFI interfaces.
 
+[![Minimum PHP Version](http://img.shields.io/badge/php-%3E%207.4.0-8892BF.svg)](https://php.net/)
 [![Build Status](https://travis-ci.org/vkhramtsov/tesseract-bridge.svg?branch=master)](https://travis-ci.org/vkhramtsov/tesseract-bridge)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/58a3278711f649dd80b97c6871189d02)](https://www.codacy.com/gh/vkhramtsov/tesseract-bridge/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vkhramtsov/tesseract-bridge&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/vkhramtsov/tesseract-bridge/branch/master/graph/badge.svg?token=U056TFE2OO)](https://codecov.io/gh/vkhramtsov/tesseract-bridge)

@@ -33,7 +33,7 @@ class CLI implements BridgeInterface
             return '';
         }
         $matches = [];
-        preg_match('/[\d\.]+.*$/', $output[0], $matches);
+        preg_match('/[\d\.]+.*$/', (string) $output[0], $matches);
 
         return $matches[0] ?? '';
     }
@@ -44,11 +44,8 @@ class CLI implements BridgeInterface
     public function getAvailableLanguages(): array
     {
         $output = $this->executeCommand(['--list-langs'])->getOutputArray();
-        if (empty($output)) {
-            return [];
-        }
 
-        return array_slice($output, 1);
+        return empty($output) ? [] : array_slice($output, 1);
     }
 
     /**

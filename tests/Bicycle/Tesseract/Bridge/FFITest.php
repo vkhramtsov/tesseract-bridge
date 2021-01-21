@@ -55,12 +55,64 @@ class FFITest extends TestCase
         new FFI($configuration);
     }
 
+    /**
+     * @return array
+     */
+    public function headerFileDataProvider(): array
+    {
+        $emptyHeaderPath = realpath(
+            sprintf(
+                '%1$s%2$s..%2$s..%2$s..%2$sdata%2$stext%2$sempty_c_header.h',
+                __DIR__,
+                DIRECTORY_SEPARATOR
+            )
+        );
+
+        return [
+            [$emptyHeaderPath],
+            [''],
+        ];
+    }
+
+    /**
+     * @dataProvider headerFileDataProvider
+     *
+     * @param string $headerPath
+     */
+    public function testWithEmptyHeaderFile(string $headerPath): void
+    {
+        $this->isFFIEnabled();
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Cannot use FFI without valid header file');
+        $configuration = new Configuration(['capi_header_path' => $headerPath]);
+        new FFI($configuration);
+    }
+
     public function testIncorrectConfiguration(): void
     {
         $this->isFFIEnabled();
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Problem with connecting library via FFI: empty library path');
         $configuration = new Configuration([]);
+        new FFI($configuration);
+    }
+
+    public function testIncorrectHeaderFile(): void
+    {
+        $incorrectHeaderPath = realpath(
+            sprintf(
+                '%1$s%2$s..%2$s..%2$s..%2$sdata%2$stext%2$sincorrect_c_header.h',
+                __DIR__,
+                DIRECTORY_SEPARATOR
+            )
+        );
+        $this->isFFIEnabled();
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessageMatches('/^Problem with connecting library via FFI\: .+$/');
+        $configuration = new Configuration([
+            'capi_header_path' => $incorrectHeaderPath,
+            'library_path' => 'libtesseract.so.4',
+        ]);
         new FFI($configuration);
     }
 

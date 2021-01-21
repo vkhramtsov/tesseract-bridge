@@ -1,4 +1,4 @@
-#!/bin/sh -xe
+#!/bin/sh
 
 currentDir="$(dirname $(realpath "$0"))"
 tmpDir="$currentDir/tmp";

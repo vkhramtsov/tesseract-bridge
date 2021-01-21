@@ -24,6 +24,7 @@ addons:
       - tesseract-ocr-eng
       - tesseract-ocr-deu
       - tesseract-ocr-spa
+      - docker-ce
 
 branches:
   only:
@@ -44,6 +45,11 @@ script:
   - php vendor/bin/phpcpd --exclude vendor .
   - php -d=xdebug.mode=coverage vendor/bin/phpunit
   - composer outdated -D
+  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -Ls https://coverage.codacy.com/get.sh) report
+  - rm -rf tests/tmp && chmod 777 tests && chmod 666 clover.xml
+  - docker build --build-arg PHP_VERSION="$(php -r 'echo PHP_MAJOR_VERSION, ".", PHP_MINOR_VERSION;')" -t php-ffi ./Resources/configs/docker/php
+  - docker run -v "$(pwd)":/var/www/html php-ffi su -c "cd /var/www/html && sh tests/prepareData.sh && php -d=xdebug.mode=coverage vendor/bin/phpunit" -s /bin/bash www-data
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
