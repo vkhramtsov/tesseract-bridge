@@ -34,16 +34,10 @@ before_script:
   - composer validate
   - composer install
   - if [[ $PREFER_LOWEST == 1 ]]; then composer update --prefer-lowest; fi
-  - cd src && ! find . -type f -name "*.php" -exec php -d error_reporting=32767 -l {} \; 2>&1 >&- | grep "^" && cd ../tests && ! find . -type f -name "*.php" -exec php -d error_reporting=32767 -l {} \; 2>&1 >&- | grep "^" && cd ..
 
 script:
   - sh tests/prepareData.sh
-  - php vendor/bin/php-cs-fixer fix --dry-run --diff
-  - php vendor/bin/phpcs --standard=PSR12 src tests
-  - php vendor/bin/phpmd . text Resources/configs/phpmd/phpmd.xml --exclude vendor
-  - php vendor/bin/psalm --show-info=true
-  - php vendor/bin/phpcpd --exclude vendor .
-  - php -d=xdebug.mode=coverage vendor/bin/phpunit
+  - php -d=xdebug.mode=coverage vendor/bin/phing build-ci
   - composer outdated -D
   - bash <(curl -s https://codecov.io/bash)
   - bash <(curl -Ls https://coverage.codacy.com/get.sh) report
