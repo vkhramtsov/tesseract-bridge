@@ -130,7 +130,7 @@
     <target name="build" description="Runs build locally" depends="composer-validate, phplint, php-cs-fixer, phpcs,
     phpmd, phpcpd, psalm, phpunit, dependencies-list-outdated" />
 
-    <target name="build-ci" description="Run CI build" depends="phplint, php-cs-fixer-ci, phpcs,
-    phpmd, phpcpd, psalm, phpunit-ci" />
+    <target name="build-ci" description="Run CI build" depends="phplint, php-cs-fixer-ci, phpcs, phpmd, phpcpd, psalm,
+    phpunit-ci" />
 
 </project>
