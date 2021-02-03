@@ -37,7 +37,7 @@ before_script:
 
 script:
   - sh tests/prepareData.sh
-  - php -d=xdebug.mode=coverage vendor/bin/phing build-ci
+  - php phing.phar build-ci
   - composer outdated -D
   - bash <(curl -s https://codecov.io/bash)
   - bash <(curl -Ls https://coverage.codacy.com/get.sh) report
